@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Updates</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<canvas id="priceChart" width="800" height="400"></canvas>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('priceChart').getContext('2d');
+
+        const priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Price Updates',
+                    data: [],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'second',
+                            displayFormats: {
+                                second: 'h:mm:ss a'
+                            }
+                        },
+                        distribution: 'series',
+                        ticks: {
+                            source: 'auto'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Price'
+                        }
+                    }]
+                }
+            }
+        });
+
+        const eventSource = new EventSource('http://localhost:9000/updates');
+
+        eventSource.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            const price = data.price;
+
+            priceChart.data.datasets[0].data.push({
+                x: new Date(),
+                y: price
+            });
+
+            priceChart.data.labels.push('');
+            priceChart.update();
+        };
+    });
+</script>
+</body>
+</html>
