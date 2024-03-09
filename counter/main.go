@@ -36,18 +36,21 @@ func userCount(w http.ResponseWriter, r *http.Request) {
 	for {
 		lastEventID++
 		// Write lines
-		fmt.Fprintf(w, "id: %v\n", lastEventID)   // event ID
-		fmt.Fprintf(w, "retry: %d\n", 5000)       // event ID
-		fmt.Fprintf(w, "event: userCount\n")      // Event name
-		fmt.Fprintf(w, "data: %d\n", lastEventID) // it's not the last line
-		fmt.Fprintf(w, "data: users \n\n")        // it's the last line
+		_, err := fmt.Fprintf(w, "id: %v\n", lastEventID) // event ID
+		if err != nil {
+			// TODO: Handle disconnect
+			return
+		}
+		_, err = fmt.Fprintf(w, "retry: %d\n", 5000)       // event ID
+		_, err = fmt.Fprintf(w, "event: userCount\n")      // Event name
+		_, err = fmt.Fprintf(w, "data: %d\n", lastEventID) // it's not the last line
+		_, err = fmt.Fprintf(w, "data: users \n\n")        // it's the last line
 		// Flush
 		if f, ok := w.(http.Flusher); ok {
 			f.Flush()
 		}
 		time.Sleep(time.Second)
 	}
-
 }
 
 func getEventID(r http.Request) (int64, error) {

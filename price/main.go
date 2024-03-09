@@ -34,6 +34,7 @@ func main() {
 			price := <-updates
 			// Format the message as an SSE event
 			fmt.Fprintf(w, "data: {\"price\": %f}\n\n", price)
+			fmt.Println("Price updated: ", price)
 			// Flush the response to send the event immediately
 			w.(http.Flusher).Flush()
 		}
